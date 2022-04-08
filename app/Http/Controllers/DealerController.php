@@ -14,7 +14,11 @@ class DealerController extends Controller
      */
     public function index()
     {
-        return Dealer::orderBy('id','desc')->paginate(10);
+        // return Dealer::orderBy('id','desc')->paginate(10);
+        // return Dealer::all();
+        return Dealer::orderBy('id','desc')->get();
+
+
     }
     public function search($search)
     {
@@ -109,10 +113,5 @@ class DealerController extends Controller
             return  ['Success'];
         }
     }
-    public function cleanup()
-    {       
-        DB::statement("SET @count = 0;");
-        DB::statement("UPDATE `dealers` SET `dealers`.`id` = @count:= @count + 1;");
-        DB::statement("ALTER TABLE `dealers` AUTO_INCREMENT = 1;");
-    }
+  
 }
