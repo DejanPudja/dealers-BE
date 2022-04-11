@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Dealer;
 use Illuminate\Support\Facades\DB;
+use Mail;
+// use App\Exception;
 
 class DealerController extends Controller
 {
@@ -14,11 +16,15 @@ class DealerController extends Controller
      */
     public function index()
     {
-        // return Dealer::orderBy('id','desc')->paginate(10);
-        // return Dealer::all();
-        return Dealer::orderBy('id','desc')->get();
+        // return response()->json(Dealer::orderBy('id','desc')->get(), status:200);
+        // return response()->json(Dealer::all()->where('id',2113), status:200);
+        // return Dealer::orderBy('id','desc')->get();
+        try{
+            return response()->json(Dealer::orderBy('id','desc')->get());
 
-
+        }catch(\Exception $exception){
+            return response()->json(['message'=>$exception->getMessage()]);
+        }
     }
     public function search($search)
     {
@@ -43,17 +49,26 @@ class DealerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        $dealer = new Dealer;
-        $dealer->title = $request->title;
-        $dealer->address = $request->address;
-        $dealer->lat = $request->lat;
-        $dealer->lng = $request->lng;
-        $request = $dealer->save();
+    public function store(Request $request){
+        $request->validate([
+            'title'=>'required|min:5|max:255',
+            'address'=>'required|min:5|max:255',
+            'lat'=>'required|min:5|max:255',
+            'lng'=>'required|min:5|max:255',
+        ]);
 
-        if($request){
-            return  ['Success'];
+        try{
+            $dealer = new Dealer;
+            $dealer->title = $request->title;
+            $dealer->address = $request->address;
+            $dealer->lat = $request->lat;
+            $dealer->lng = $request->lng;
+            $request = $dealer->save();
+            if($request){
+                return  ['Success'];
+            }
+        }catch(Exception $exception){
+            return response()->json(['message'=>$exception->getMessage()]);
         }
     }
 
@@ -105,13 +120,34 @@ class DealerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id){
         $dealer = Dealer::find($id);
         $request = $dealer->delete();
         if($request){
             return  ['Success'];
         }
     }
-  
+    public function init(Request $request){
+        $data = ['name'=>'','email'=>$request->email,'data'=> $request->message];
+        $user['to'] = 'learnlaravel1@gmail.com';
+
+        $mail = Mail::send('mail',$data, function($messages) use ($user){
+            $messages->to($user['to']);
+            $messages->subject('Hello');
+        });
+
+        if($mail){
+            $this->sendEmail($request->email);
+            return ['Success'];
+        }
+    }
+    public function sendEmail($email){
+        $data = ['name'=>'','email'=> $email, 'data'=> 'Hvala Vam na poruci koju ste nam poslali'];
+        $user['to'] = $email;
+        
+        Mail::send('mailSend', $data, function($messages) use ($user){
+            $messages->to($user['to']);
+            $messages->subject('Uspesno primljena poruka');
+        });;
+    }
 }

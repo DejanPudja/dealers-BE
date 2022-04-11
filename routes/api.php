@@ -25,6 +25,4 @@ Route::get('dealer/show/{id}',[DealerController::class, 'show']);
 Route::delete('dealer/delete/{id}',[DealerController::class, 'destroy']);
 // Route::get('dealers/search/{string}',[DealerController::class, 'search']);
 Route::get('dealers/search/{string}',[DealerController::class, 'search']);
-Route::get('cleanup',[DealerController::class, 'cleanup']);
-
-
+Route::post('mail', [DealerController::class, 'init']);
