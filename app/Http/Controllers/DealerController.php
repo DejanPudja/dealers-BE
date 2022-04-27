@@ -16,14 +16,16 @@ class DealerController extends Controller
      */
     public function index()
     {
-        // return response()->json(Dealer::orderBy('id','desc')->get(), status:200);
-        // return response()->json(Dealer::all()->where('id',2113), status:200);
-        // return Dealer::orderBy('id','desc')->get();
         try{
-            return response()->json(Dealer::orderBy('id','desc')->get());
-
+            $dealers = Dealer::orderBy('id','desc')->paginate(10);
+            if(!$dealers){
+                return response()->json(['message'=>'Data is not available'],status:404);
+            }else{
+                
+                return response()->json(['message'=>'Success delete dealer','data'=>$dealers],status:200);
+            }
         }catch(\Exception $exception){
-            return response()->json(['message'=>$exception->getMessage()]);
+            return response()->json(['message'=>$exception->getMessage()],status:406);
         }
     }
     public function search($search)
@@ -63,13 +65,29 @@ class DealerController extends Controller
             $dealer->address = $request->address;
             $dealer->lat = $request->lat;
             $dealer->lng = $request->lng;
-            $request = $dealer->save();
-            if($request){
-                return  ['Success'];
+            if(!$dealer){
+                return response()->json(['message'=>'Error'],status:404);
+            }else{
+                $request = $dealer->save();
+                return response()->json(['message'=>'Success add dealer'],status:200);
             }
-        }catch(Exception $exception){
-            return response()->json(['message'=>$exception->getMessage()]);
+        }catch(\Exception $exception){
+            return response()->json(['message'=>$exception->getMessage()],status:406);
         }
+
+        // try{
+        //     $dealer = new Dealer;
+        //     $dealer->title = $request->title;
+        //     $dealer->address = $request->address;
+        //     $dealer->lat = $request->lat;
+        //     $dealer->lng = $request->lng;
+        //     $request = $dealer->save();
+        //     if($request){
+        //         return  ['Success'];
+        //     }
+        // }catch(\Exception $exception){
+        //     return response()->json(['message'=>$exception->getMessage()]);
+        // }
     }
 
     /**
@@ -121,10 +139,16 @@ class DealerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id){
-        $dealer = Dealer::find($id);
-        $request = $dealer->delete();
-        if($request){
-            return  ['Success'];
+        try{
+            $dealer = Dealer::find($id);
+            if(!$dealer){
+                return response()->json(['message'=>'Data is not available'],status:404);
+            }else{
+                $request = $dealer->delete();
+                return response()->json(['message'=>'Success delete dealer'],status:200);
+            }
+        }catch(\Exception $exception){
+            return response()->json(['message'=>$exception->getMessage()],status:406);
         }
     }
     public function init(Request $request){
