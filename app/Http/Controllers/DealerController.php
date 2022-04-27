@@ -152,17 +152,36 @@ class DealerController extends Controller
         }
     }
     public function init(Request $request){
-        $data = ['name'=>'','email'=>$request->email,'data'=> $request->message];
-        $user['to'] = 'learnlaravel1@gmail.com';
+        // $data = ['name'=>'','email'=>$request->email,'data'=> $request->message];
+        // $user['to'] = 'learnlaravel1@gmail.com';
 
-        $mail = Mail::send('mail',$data, function($messages) use ($user){
-            $messages->to($user['to']);
-            $messages->subject('Hello');
-        });
+        // $mail = Mail::send('mail',$data, function($messages) use ($user){
+        //     $messages->to($user['to']);
+        //     $messages->subject('Hello');
+        // });
 
-        if($mail){
-            $this->sendEmail($request->email);
-            return ['Success'];
+        // if($mail){
+        //     $this->sendEmail($request->email);
+        //     return ['Success'];
+        // }
+
+
+        try{
+            $data = ['name'=>'','email'=>$request->email,'data'=> $request->message];
+            $user['to'] = 'learnlaravel1@gmail.com';
+        
+            if(!$request->email && $request->message){
+                return response()->json(['message'=>'Not found'],status:404);
+            }else{
+                $mail = Mail::send('mail',$data, function($messages) use ($user){
+                    $messages->to($user['to']);
+                    $messages->subject('Hello');
+                });    
+                $this->sendEmail($request->email);
+                return response()->json(['message'=>'Success send email'],status:200);
+            }
+        }catch(\Exception $exception){
+            return response()->json(['message'=>$exception->getMessage()],status:406);
         }
     }
     public function sendEmail($email){
