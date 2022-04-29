@@ -22,7 +22,7 @@ class DealerController extends Controller
                 return response()->json(['message'=>'Data is not available'],status:404);
             }else{
                 
-                return response()->json(['message'=>'Success delete dealer','data'=>$dealers],status:200);
+                return response()->json(['data'=>$dealers],status:200);
             }
         }catch(\Exception $exception){
             return response()->json(['message'=>$exception->getMessage()],status:406);
@@ -74,20 +74,6 @@ class DealerController extends Controller
         }catch(\Exception $exception){
             return response()->json(['message'=>$exception->getMessage()],status:406);
         }
-
-        // try{
-        //     $dealer = new Dealer;
-        //     $dealer->title = $request->title;
-        //     $dealer->address = $request->address;
-        //     $dealer->lat = $request->lat;
-        //     $dealer->lng = $request->lng;
-        //     $request = $dealer->save();
-        //     if($request){
-        //         return  ['Success'];
-        //     }
-        // }catch(\Exception $exception){
-        //     return response()->json(['message'=>$exception->getMessage()]);
-        // }
     }
 
     /**
@@ -98,7 +84,18 @@ class DealerController extends Controller
      */
     public function show($id)
     {
-        return $dealer = Dealer::all()->where('id', $id);
+        // return $dealer = Dealer::find($id);
+        try{
+            $dealer = Dealer::find($id);
+            if(!$dealer){
+                return response()->json(['message'=>'Data is not available'],status:404);
+            }else{
+                return $dealer;
+                return response()->json(['data'=>$dealer],status:200);
+            }
+        }catch(\Exception $exception){
+            return response()->json(['message'=>$exception->getMessage()],status:406);
+        }
     }
 
     /**
@@ -121,15 +118,28 @@ class DealerController extends Controller
      */
     public function update(Request $request)
     {
-        $dealer = Dealer::find($request->id);
-        $dealer->title = $request->title;
-        $dealer->address = $request->address;
-        $dealer->lat = $request->lat;
-        $dealer->lng = $request->lng;
-        $request = $dealer->save();
-        if($request){
-            return  ['Success'];
+        $request->validate([
+            'title'=>'required|min:5|max:255',
+            'address'=>'required|min:5|max:255',
+            'lat'=>'required|min:5|max:255',
+            'lng'=>'required|min:5|max:255',
+        ]);
+        try{
+            $dealer = Dealer::find($request->id);
+            $dealer->title = $request->title;
+            $dealer->address = $request->address;
+            $dealer->lat = $request->lat;
+            $dealer->lng = $request->lng;
+            if(!$dealer){
+                return response()->json(['message'=>'Error'],status:404);
+            }else{
+                $request = $dealer->save();
+                return response()->json(['message'=>'Success edit dealer'],status:200);
+            }
+        }catch(\Exception $exception){
+            return response()->json(['message'=>$exception->getMessage()],status:406);
         }
+        
     }
 
     /**
@@ -152,20 +162,6 @@ class DealerController extends Controller
         }
     }
     public function init(Request $request){
-        // $data = ['name'=>'','email'=>$request->email,'data'=> $request->message];
-        // $user['to'] = 'learnlaravel1@gmail.com';
-
-        // $mail = Mail::send('mail',$data, function($messages) use ($user){
-        //     $messages->to($user['to']);
-        //     $messages->subject('Hello');
-        // });
-
-        // if($mail){
-        //     $this->sendEmail($request->email);
-        //     return ['Success'];
-        // }
-
-
         try{
             $data = ['name'=>'','email'=>$request->email,'data'=> $request->message];
             $user['to'] = 'learnlaravel1@gmail.com';
