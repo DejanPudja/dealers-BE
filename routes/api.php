@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DealerController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,16 +16,19 @@ use App\Http\Controllers\DealerController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+//Auth
+Route::post('/register',[AuthController::class, 'register']);
+Route::post('/login',[AuthController::class, 'login']);
+
+//Protected routes
+Route::group(['middleware'=>['auth:sanctum']],function(){
+    Route::post('/logout',[AuthController::class, 'logout']);
+    Route::get('dealers',[DealerController::class, 'index']);
+    Route::get('dealer/show/{id}',[DealerController::class, 'show']);
+    Route::get('dealers/search/{string}',[DealerController::class, 'search']);
+    Route::post('dealer/add',[DealerController::class, 'store']);
+    Route::post('mail', [DealerController::class, 'init']);
+    Route::put('dealer/update',[DealerController::class, 'update']);
+    Route::delete('dealer/delete/{id}',[DealerController::class, 'destroy']);
 });
-Route::get('dealers',[DealerController::class, 'index']);
-Route::put('dealer/update',[DealerController::class, 'update']);
-Route::post('dealer/add',[DealerController::class, 'store']);
-Route::get('dealer/show/{id}',[DealerController::class, 'show']);
-Route::delete('dealer/delete/{id}',[DealerController::class, 'destroy']);
-// Route::get('dealers/search/{string}',[DealerController::class, 'search']);
-Route::get('dealers/search/{string}',[DealerController::class, 'search']);
-Route::get('cleanup',[DealerController::class, 'cleanup']);
-
-
+  
