@@ -9,11 +9,34 @@ use Mail;
 
 class DealerController extends Controller
 {
-    /**
+    /*
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+
+/**
+ * @OA\Get(
+ *     path="/api/dealers",
+ *     @OA\Response(response="200", description="Display a listing of projects.")
+ * )
+ * 
+ * @OA\Get(
+ *     path="/api/dealer/show/689",
+ *     @OA\Response(response="200", description="Display a listing of projects.")
+ * )
+ * 
+ * @OA\Get(
+ *     path="/api/dealers/search/DONNELLY",
+ *     @OA\Response(response="200", description="Display a listing of projects.")
+ * )
+ * @OA\Post(
+ *     path="/api/dealer/add",
+ *     @OA\Response(response="200", description="OK")
+ * )
+ * 
+ */
+
     public function index()
     {
         try{
@@ -84,7 +107,6 @@ class DealerController extends Controller
      */
     public function show($id)
     {
-        // return $dealer = Dealer::find($id);
         try{
             $dealer = Dealer::find($id);
             if(!$dealer){
